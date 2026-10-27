@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "CRM Xigma (Comunidad CPE) - CRM para WhatsApp Web",
+  "version": "1.4.1",
+  "description": "Convierte WhatsApp Web en un CRM: etiquetas, embudo, notas, recordatorios, respuestas rápidas y conversaciones sincronizadas.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://mm.comunidadcpe.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://web.whatsapp.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "CRM Xigma (Comunidad CPE)",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,18 @@
+# Datos y secretos: nunca al repo
+crm-data/
+*.sqlite
+*.sqlite-*
+sessions/
+lib.php
+.env
+*.env
+# Respaldos, paquetes y logs
+*.zip
+*.tgz
+*.tar.gz
+*.bak*
+mm-backups/
+*.log
+error_log
+.dh-diag
+.DS_Store
