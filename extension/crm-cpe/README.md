@@ -1,22 +1,22 @@
-# CRM Xigma – Extensión de Chrome para WhatsApp Web
+# crm-cpe – Extensión de Chrome para WhatsApp Web
 
-Versión 1.5.0 (Comunidad CPE) · Xigma Group
+Versión 1.5.0 · Comunidad CPE
 
 Convierte WhatsApp Web en un CRM básico. Los datos se guardan en tu navegador (`chrome.storage.local`) y, si te conectas, se sincronizan con tu servidor **https://mm.comunidadcpe.com** para tenerlos iguales en todas tus computadoras.
 
 ## Instalación
-1. Descomprime `crm-xigma-v1.4.0.zip`: obtendrás la carpeta `crm-xigma-cpe`.
+1. Descomprime `crm-cpe-v1.5.0.zip`: obtendrás la carpeta `crm-cpe`.
 2. Abre `chrome://extensions` en Chrome.
 3. Activa **Modo de desarrollador** (arriba a la derecha).
-4. Clic en **Cargar descomprimida** y elige la carpeta `crm-xigma-cpe`.
+4. Clic en **Cargar descomprimida** y elige la carpeta `crm-cpe`.
 5. Abre (o recarga) https://web.whatsapp.com.
 
-**Si ya tenías la versión anterior (CRM Whats):** para conservar los datos locales, copia los archivos de `crm-xigma` dentro de tu carpeta actual (`crm-whats`), reemplazándolos, y pulsa **Recargar** en `chrome://extensions`. Si prefieres cargar la carpeta nueva, conéctate de nuevo al servidor en Ajustes → Sincronización y se descargarán tus datos (luego elimina la extensión antigua).
+**Si ya tenías la versión anterior (CRM Xigma / carpeta `crm-xigma-cpe`):** quita la extensión antigua en `chrome://extensions`, carga la carpeta `crm-cpe` y vuelve a conectarte en Ajustes → Sincronización: se descargarán tus leads del servidor.
 
 Panel web: https://mm.comunidadcpe.com/mm (mismo usuario y contraseña).
 
 ## Uso
-- **Botón verde Xigma "CRM"** (abajo a la derecha) o el ícono de la extensión: muestra/oculta el panel.
+- **Botón verde "CRM"** (abajo a la derecha) o el ícono de la extensión: muestra/oculta el panel.
 - **Contacto**: abre un chat → "Agregar al CRM". Edita etapa, valor (S/), etiquetas, notas y recordatorio.
 - **Conversación**: al abrir un chat se capturan los mensajes visibles (entrantes y salientes) y se muestran en la ficha. Con el servidor conectado, se guardan en mm.comunidadcpe.com. No se descargan imágenes/audios: solo una etiqueta como `[Imagen]` y el pie de foto si hay.
 - **Guardar como lead (v1.5.0)**: nada se guarda ni se envía al CRM automáticamente. En el chat abierto, pestaña **Contacto**, pulsa **💾 Guardar como lead**: se crea la ficha (etapa **Nuevo**) y desde ese momento se guarda y sincroniza su conversación. Verás la marca **✓ Guardado en CRM**. **Quitar del CRM** (al final de la ficha) deja de sincronizarlo: la ficha sale del CRM en la próxima sincronización, pero lo ya guardado de la conversación en el servidor no se borra. Los chats no guardados nunca se envían al servidor.

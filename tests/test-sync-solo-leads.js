@@ -25,7 +25,7 @@ const fetch = async (url, opts = {}) => {
   return { status: 200, json: async () => ({ ok: true, messages: [] }) };
 };
 const ctx = vm.createContext({ chrome, fetch, console, setTimeout, clearTimeout, Date, Promise, Map });
-vm.runInContext(fs.readFileSync(process.argv[2] || __dirname + '/../extension/crm-xigma-cpe/background.js', 'utf8'), ctx);
+vm.runInContext(fs.readFileSync(process.argv[2] || __dirname + '/../extension/crm-cpe/background.js', 'utf8'), ctx);
 const send = (m) => new Promise((res) => { const r = listener(m, null, res); if (r !== true) {} });
 (async () => {
   await send({ type: 'sync-pull' });

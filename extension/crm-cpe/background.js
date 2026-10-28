@@ -1,4 +1,4 @@
-// CRM Xigma - service worker: recordatorios + sync + conversaciones
+// crm-cpe - service worker: recordatorios + sync + conversaciones
 const PREFIX = 'crmw-rem-';
 const MSG_CAP = 500;
 

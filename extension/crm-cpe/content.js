@@ -1,4 +1,4 @@
-// CRM Xigma - content script para WhatsApp Web
+// crm-cpe - content script para WhatsApp Web
 (() => {
   'use strict';
   if (window.__crmwLoaded) return;
@@ -627,7 +627,7 @@
     if (!panel) return;
     const tabs = [['contacto', 'Contacto'], ['respuestas', 'Respuestas'], ['ajustes', 'Ajustes']];
     panel.innerHTML = `
-      <div class="crmw-head"><strong>CRM <span>Xigma</span></strong>
+      <div class="crmw-head"><strong>CRM <span>CPE</span></strong>
         <div><button class="crmw-btn crmw-sm" data-act="kanban" title="Tablero">▦ Embudo</button>
         <button class="crmw-btn crmw-sm" data-act="list" title="Lista">☰ Lista</button>
         <button class="crmw-x" data-act="close" title="Ocultar">×</button></div></div>
@@ -766,8 +766,8 @@
         save(['stages', 'contacts']); break;
       }
       case 'up': { const i = +t.dataset.i; if (i > 0) { [state.stages[i - 1], state.stages[i]] = [state.stages[i], state.stages[i - 1]]; save(['stages']); } break; }
-      case 'csv': return download('crm-xigma-contactos.csv', toCSV(), 'text/csv;charset=utf-8');
-      case 'json': return download('crm-xigma-backup.json', JSON.stringify({ version: 2, exported: new Date().toISOString(), contacts: state.contacts, labels: state.labels, stages: state.stages, replies: state.replies, conversations: convCache }, null, 2), 'application/json');
+      case 'csv': return download('crm-cpe-contactos.csv', toCSV(), 'text/csv;charset=utf-8');
+      case 'json': return download('crm-cpe-backup.json', JSON.stringify({ version: 2, exported: new Date().toISOString(), contacts: state.contacts, labels: state.labels, stages: state.stages, replies: state.replies, conversations: convCache }, null, 2), 'application/json');
       case 'imp': return $('#crmw-file').click();
       case 'sconnect': {
         const url = $('#crmw-surl').value.trim().replace(/\/+$/, ''), user = $('#crmw-suser').value.trim(), pass = $('#crmw-spass').value;
