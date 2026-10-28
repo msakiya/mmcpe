@@ -66,6 +66,9 @@
     return state.contacts[id];
   }
   function touch(c) { c.updated = Date.now(); save(['contacts']); }
+  /** v1.5: solo los contactos marcados con "Guardar como lead" van al CRM (local y servidor). */
+  const isLead = (id) => !!(id && state.contacts[id] && state.contacts[id].lead === true);
+  const leadContacts = () => Object.values(state.contacts).filter((c) => c && c.lead === true);
 
   function mergeMsgs(a = [], b = []) {
     const map = new Map();
@@ -231,7 +234,7 @@
   }
 
   async function flushConversation(contactId) {
-    if (!contactId) return;
+    if (!contactId || !isLead(contactId)) return; // nunca subir chats no guardados como lead
     const msgs = convCache[contactId] || [];
     if (!msgs.length) return;
     convStatus = synced() ? 'Guardando en el servidor…' : 'Solo en este navegador (no conectado al servidor)';
@@ -249,7 +252,9 @@
     if (!contactId) return;
     const local = await bg({ type: 'conv-local', contactId });
     if (local?.messages) convCache[contactId] = mergeMsgs(convCache[contactId] || [], local.messages);
-    if (synced()) {
+    if (!isLead(contactId)) {
+      convStatus = 'Pulsa "Guardar como lead" para guardar este contacto y su conversación en el CRM';
+    } else if (synced()) {
       convStatus = 'Cargando conversación…';
       if (tab === 'contacto') renderConvOnly();
       const r = await bg({ type: 'conv-get', contactId });
@@ -258,7 +263,7 @@
     } else {
       convStatus = 'Solo en este navegador · conéctate al servidor en Ajustes para guardarla en la nube';
     }
-    if (tab === 'contacto') renderConvOnly();
+    if (current?.id === contactId && tab === 'contacto') renderConvOnly();
   }
 
   // ---------- Autocompletado de leads ----------
@@ -354,7 +359,7 @@
     }
     return changed;
   }
-  /** Inicializa un lead recién creado (manual o automático). */
+  /** Inicializa un lead recién creado (al pulsar "Guardar como lead"). */
   function initNewLead(c) {
     const cfg = AF();
     c.name = current?.name || c.name; if (!c.phone && current?.phone) c.phone = current.phone;
@@ -367,16 +372,31 @@
     autoFromMessages(c, convCache[c.id] || []);
   }
 
+  /** v1.5: ya no se crean leads automáticamente; solo cuenta si el chat fue guardado como lead. */
   function ensureLeadForCapture() {
-    if (!current) return false;
-    if (state.contacts[current.id]) return true;
-    if (!synced()) return false;
-    if (current.phonePending) return false; // esperar a confirmar el teléfono para no duplicar
+    return !!current && isLead(current.id);
+  }
+  function saveAsLead() {
+    if (!current) return;
+    const isNew = !state.contacts[current.id];
     const c = getContact(current.id);
-    initNewLead(c);
+    if (isNew) initNewLead(c);
+    if (!c.phone && current.phone) c.phone = current.phone;
+    c.lead = true; c.leadAt = Date.now();
     touch(c);
-    convStatus = 'Lead creado · Guardando conversación…';
-    return true;
+    convStatus = synced() ? 'Guardado en CRM · Guardando conversación…' : 'Guardado en CRM (solo en este navegador hasta que te conectes al servidor)';
+    lastScrapedKey = '';
+    captureNow('force');
+    if (synced()) loadConversation(current.id);
+    toast('Guardado en CRM ✓');
+  }
+  function removeLead() {
+    const c = current && state.contacts[current.id]; if (!c) return;
+    if (!confirm('¿Quitar este contacto del CRM?\n\nDeja de sincronizarse: su ficha desaparece del CRM en la próxima sincronización. Lo ya guardado de la conversación en el servidor no se borra. Puedes volver a guardarlo cuando quieras.')) return;
+    c.lead = false; c.leadAt = 0;
+    touch(c);
+    convStatus = '';
+    toast('Quitado del CRM');
   }
 
   function captureNow(reason) {
@@ -387,10 +407,10 @@
     if (key === lastScrapedKey && reason !== 'force') return;
     lastScrapedKey = key;
 
-    const ok = ensureLeadForCapture() || !!state.contacts[current.id];
-    if (!ok && current.phonePending) { convStatus = 'Detectando teléfono…'; if (tab === 'contacto') renderConvOnly(); lastScrapedKey = ''; return; }
+    const ok = ensureLeadForCapture();
     if (!ok) {
-      convStatus = synced() ? 'Agrega al CRM para guardar la conversación' : 'Agrega al CRM (o conéctate al servidor en Ajustes) para guardar la conversación';
+      // No es lead: no se guarda ni se envía nada (ni la ficha ni la conversación).
+      convStatus = 'Pulsa "Guardar como lead" para guardar este contacto y su conversación en el CRM';
       if (tab === 'contacto') renderConvOnly();
       return;
     }
@@ -622,12 +642,13 @@
   function contactHTML() {
     if (!current) return `<p class="crmw-muted">Abre un chat para ver y editar la ficha del contacto.</p>`;
     const c = state.contacts[current.id];
-    if (!c) return `<div class="crmw-card"><h3>${esc(current.name)}</h3>${current.phone ? `<p class="crmw-muted">${esc(current.phone)}</p>` : ''}
-      <button class="crmw-btn" data-act="add">+ Agregar al CRM</button>
-      <p class="crmw-muted" style="margin-top:8px">Con el servidor conectado, al abrir un chat se crea el lead solo y se guarda la conversación.</p>
-      <div id="crmw-conv-wrap">${convHTML(current.id)}</div></div>`;
+    if (!c || c.lead !== true) return `<div class="crmw-card"><h3>${esc(current.name)}</h3>${current.phone ? `<p class="crmw-muted">${esc(current.phone)}</p>` : ''}
+      <p class="crmw-muted"><span class="crmw-badge off">No está en el CRM</span></p>
+      <button class="crmw-btn crmw-lead" data-act="add">💾 Guardar como lead</button>
+      <p class="crmw-muted" style="margin-top:8px">Solo los chats que guardes como lead van al CRM: se crea su ficha y se guarda su conversación${synced() ? ' en el servidor' : ''}. Los demás chats nunca se envían.</p></div>`;
     const reminderPast = c.reminder && !c.reminderDone && new Date(c.reminder) < new Date();
     return `<div class="crmw-card">
+      <p class="crmw-row" style="margin:0 0 4px"><span class="crmw-badge">✓ Guardado en CRM</span></p>
       <input class="crmw-title" data-f="name" value="${esc(c.name)}">
       <input class="crmw-in" data-f="phone" placeholder="Teléfono" value="${esc(c.phone)}">
       <label>Etapa</label>
@@ -645,7 +666,7 @@
       <button class="crmw-btn" data-act="note">Guardar nota</button>
       <ul class="crmw-notes">${[...c.notes].reverse().map((n) => `<li><small>${fmtDate(n.ts)}</small><button class="crmw-x" data-act="delnote" data-id="${n.id}">×</button><div>${esc(n.text)}</div></li>`).join('')}</ul>
       <div id="crmw-conv-wrap">${convHTML(current.id)}</div>
-      <button class="crmw-btn crmw-danger crmw-sm" data-act="delc">Eliminar del CRM</button>
+      <button class="crmw-btn crmw-danger crmw-sm" data-act="unlead" title="Deja de sincronizar este contacto (no borra la conversación del servidor)">Quitar del CRM</button>
     </div>`;
   }
 
@@ -710,7 +731,8 @@
       case 'close': return setOpen(false);
       case 'kanban': return openModal('kanban');
       case 'list': return openModal('list');
-      case 'add': { const nc = getContact(current.id); initNewLead(nc); touch(nc); captureNow('force'); break; }
+      case 'add': saveAsLead(); break;
+      case 'unlead': removeLead(); break;
       case 'goset': tab = 'ajustes'; break;
       case 'tl': {
         if (!c) return;
@@ -769,7 +791,7 @@
     const t = e.target;
     if (t.id === 'crmw-file') return importFile(t.files[0]);
     if (t.dataset.f && current) {
-      const c = state.contacts[current.id]; if (!c) return;
+      const c = state.contacts[current.id]; if (!c || c.lead !== true) return;
       const f = t.dataset.f;
       c[f] = t.type === 'checkbox' ? t.checked : f === 'value' ? parseFloat(t.value) || 0 : t.value;
       c.manual = { ...(c.manual && !Array.isArray(c.manual) ? c.manual : {}), [f]: true }; // no autocompletar lo que editas tú
@@ -801,7 +823,7 @@
   const csvCell = (v) => { const s = String(v ?? ''); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   function toCSV() {
     const lname = (id) => state.labels.find((l) => l.id === id)?.name || '';
-    const rows = Object.values(state.contacts).map((c) => [c.id, c.name, c.phone, c.stage, c.labels.map(lname).filter(Boolean).join('|'), c.value, c.reminder, c.reminderNote,
+    const rows = leadContacts().map((c) => [c.id, c.name, c.phone, c.stage, c.labels.map(lname).filter(Boolean).join('|'), c.value, c.reminder, c.reminderNote,
       c.notes.map((n) => `[${new Date(n.ts).toISOString()}] ${n.text}`).join(' || '), new Date(c.created).toISOString(), new Date(c.updated).toISOString()]);
     return '\uFEFF' + [CSV_COLS, ...rows].map((r) => r.map(csvCell).join(',')).join('\n');
   }
@@ -831,7 +853,7 @@
       if (file.name.toLowerCase().endsWith('.json')) {
         const d = JSON.parse(text);
         if (!confirm('Importar backup JSON. Los contactos con el mismo ID se sobrescriben. ¿Continuar?')) return;
-        Object.assign(state.contacts, d.contacts || {}); n = Object.keys(d.contacts || {}).length;
+        for (const [k, v] of Object.entries(d.contacts || {})) if (v && typeof v === 'object') state.contacts[k] = { ...v, lead: true }; n = Object.keys(d.contacts || {}).length;
         if (Array.isArray(d.labels)) d.labels.forEach((l) => { if (!state.labels.some((x) => x.id === l.id)) state.labels.push(l); });
         if (Array.isArray(d.stages)) d.stages.forEach((s) => { if (!state.stages.includes(s)) state.stages.push(s); });
         if (Array.isArray(d.replies)) d.replies.forEach((r) => { if (!state.replies.some((x) => x.id === r.id)) state.replies.push(r); });
@@ -852,7 +874,7 @@
           });
           const stage = g('stage') || state.stages[0]; if (!state.stages.includes(stage)) state.stages.push(stage);
           const notes = g('notes') ? g('notes').split(' || ').map((t) => { const m = t.match(/^\[(.+?)\] ([\s\S]*)$/); return { id: uid(), ts: m ? Date.parse(m[1]) || Date.now() : Date.now(), text: m ? m[2] : t }; }) : [];
-          state.contacts[id] = { ...(state.contacts[id] || {}), id, name: name || id, phone, stage, labels, value: parseFloat(g('value')) || 0, reminder: g('reminder'), reminderNote: g('reminderNote'), reminderDone: false, notes, created: Date.parse(g('created')) || Date.now(), updated: Date.now() };
+          state.contacts[id] = { ...(state.contacts[id] || {}), lead: true, id, name: name || id, phone, stage, labels, value: parseFloat(g('value')) || 0, reminder: g('reminder'), reminderNote: g('reminderNote'), reminderDone: false, notes, created: Date.parse(g('created')) || Date.now(), updated: Date.now() };
           n++;
         }
       }
@@ -886,7 +908,7 @@
   function closeModal() { $('#crmw-modal')?.remove(); document.removeEventListener('keydown', escClose); }
   function filtered() {
     const q = filters.q.toLowerCase();
-    return Object.values(state.contacts).filter((c) =>
+    return leadContacts().filter((c) =>
       (!q || (c.name + ' ' + c.phone + ' ' + c.notes.map((n) => n.text).join(' ')).toLowerCase().includes(q)) &&
       (!filters.label || c.labels.includes(filters.label)) && (!filters.stage || c.stage === filters.stage))
       .sort((a, b) => b.updated - a.updated);

@@ -59,14 +59,30 @@ async function api(cfg, path, opts = {}) {
   if (r.status === 401 && cfg.token) await setSync({ token: '', lastError: 'Sesión expirada, vuelve a conectar' });
   return { status: r.status, body: j };
 }
+// v1.5: solo se envían al servidor los contactos marcados con "Guardar como lead" (lead === true).
+const onlyLeads = (contacts) => {
+  const out = {};
+  for (const [k, c] of Object.entries(contacts || {})) if (c && typeof c === 'object' && c.lead === true) out[k] = c;
+  return out;
+};
+async function isLeadId(contactId) {
+  const { crmw_contacts = {} } = await chrome.storage.local.get('crmw_contacts');
+  return !!(contactId && crmw_contacts[contactId] && crmw_contacts[contactId].lead === true);
+}
 async function localPayload() {
   const d = await chrome.storage.local.get(DATA_KEYS.map((k) => 'crmw_' + k).concat('crmw_meta'));
   const data = {}; DATA_KEYS.forEach((k) => { if (d['crmw_' + k] !== undefined) data[k] = d['crmw_' + k]; });
+  if (data.contacts) data.contacts = onlyLeads(data.contacts);
   return { updatedAt: d.crmw_meta?.updatedAt || 0, data };
 }
 async function applyServer(s) {
   const o = { crmw_meta: { updatedAt: s.updatedAt } };
   DATA_KEYS.forEach((k) => { if (s.data && s.data[k] !== undefined) o['crmw_' + k] = s.data[k]; });
+  // Lo que viene del servidor ya está en el CRM: se marca como lead.
+  if (o.crmw_contacts && typeof o.crmw_contacts === 'object') {
+    const c = {}; for (const [k, v] of Object.entries(o.crmw_contacts)) if (v && typeof v === 'object') c[k] = { ...v, lead: true };
+    o.crmw_contacts = c;
+  }
   await chrome.storage.local.set(o);
 }
 async function push(cfg, local) {
@@ -129,6 +145,7 @@ async function setLocalConv(contactId, messages) {
 }
 
 async function convPut(contactId, messages) {
+  if (!(await isLeadId(contactId))) return { ok: true, offline: true, notLead: true, messages: [] }; // nunca guardar/enviar chats no guardados como lead
   const cfg = await getSync();
   const local = mergeMsgs((await getLocalConvs())[contactId] || [], messages || []);
   await setLocalConv(contactId, local);
@@ -150,7 +167,7 @@ async function pushAllConversations() {
   const { crmw_contacts = {} } = await chrome.storage.local.get('crmw_contacts');
   const all = await getLocalConvs();
   for (const [cid, msgs] of Object.entries(all)) {
-    if (!crmw_contacts[cid] || !msgs?.length) continue;
+    if (!crmw_contacts[cid] || crmw_contacts[cid].lead !== true || !msgs?.length) continue;
     await convPut(cid, []);
   }
 }
@@ -158,7 +175,7 @@ async function pushAllConversations() {
 async function convGet(contactId) {
   const cfg = await getSync();
   const local = (await getLocalConvs())[contactId] || [];
-  if (!cfg.url || !cfg.token) return { ok: true, offline: true, messages: local };
+  if (!cfg.url || !cfg.token || !(await isLeadId(contactId))) return { ok: true, offline: true, messages: local };
   try {
     const path = 'conversations?contactId=' + encodeURIComponent(contactId);
     const r = await api(cfg, path);

@@ -1,6 +1,6 @@
 # CRM Xigma – Extensión de Chrome para WhatsApp Web
 
-Versión 1.4.1 (Comunidad CPE) · Xigma Group
+Versión 1.5.0 (Comunidad CPE) · Xigma Group
 
 Convierte WhatsApp Web en un CRM básico. Los datos se guardan en tu navegador (`chrome.storage.local`) y, si te conectas, se sincronizan con tu servidor **https://mm.comunidadcpe.com** para tenerlos iguales en todas tus computadoras.
 
@@ -19,14 +19,14 @@ Panel web: https://mm.comunidadcpe.com/mm (mismo usuario y contraseña).
 - **Botón verde Xigma "CRM"** (abajo a la derecha) o el ícono de la extensión: muestra/oculta el panel.
 - **Contacto**: abre un chat → "Agregar al CRM". Edita etapa, valor (S/), etiquetas, notas y recordatorio.
 - **Conversación**: al abrir un chat se capturan los mensajes visibles (entrantes y salientes) y se muestran en la ficha. Con el servidor conectado, se guardan en mm.comunidadcpe.com. No se descargan imágenes/audios: solo una etiqueta como `[Imagen]` y el pie de foto si hay.
-- Si estás conectado al servidor, al abrir un chat se crea solo un lead en etapa **Nuevo** para no perder la conversación (verás "Guardando conversación…").
+- **Guardar como lead (v1.5.0)**: nada se guarda ni se envía al CRM automáticamente. En el chat abierto, pestaña **Contacto**, pulsa **💾 Guardar como lead**: se crea la ficha (etapa **Nuevo**) y desde ese momento se guarda y sincroniza su conversación. Verás la marca **✓ Guardado en CRM**. **Quitar del CRM** (al final de la ficha) deja de sincronizarlo: la ficha sale del CRM en la próxima sincronización, pero lo ya guardado de la conversación en el servidor no se borra. Los chats no guardados nunca se envían al servidor.
 - **Embudo / Lista**: tablero Kanban con arrastrar y soltar, y lista con búsqueda y filtros por etiqueta/etapa. Doble clic abre el chat (si hay teléfono).
 - **Respuestas**: plantillas; clic para insertarlas en la caja de mensaje (nunca se envían solas). `{nombre}` se reemplaza por el primer nombre.
 - **Ajustes**: etiquetas con color, etapas editables, exportar CSV, backup JSON e importar.
 - **Recordatorios**: notificación de Chrome en la fecha/hora elegida (Chrome debe estar abierto).
 
 ## Autocompletado de leads (v1.4.0)
-Al crear un lead (botón **+ Agregar al CRM** o automáticamente con el servidor conectado) se llenan solos:
+Al guardar un lead (botón **💾 Guardar como lead**) se llenan solos:
 - **Teléfono**: del título del chat si es un número; si el contacto está guardado con nombre, de los identificadores internos de los mensajes (`…@c.us`); si no, del panel **Info. del contacto** si está abierto. Números de 9 dígitos que empiezan con 9 se guardan con 51 (Perú). En leads ya existentes sin teléfono se rellena al abrir su chat (misma ficha, sin duplicar).
 - **Nombre** (del chat) y **etapa** = primera etapa (Nuevo).
 - **Recordatorio**: "Primer seguimiento" al día siguiente a las 10:00 (hora Lima). Configurable en Ajustes.

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CRM Xigma (Comunidad CPE) - CRM para WhatsApp Web",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Convierte WhatsApp Web en un CRM: etiquetas, embudo, notas, recordatorios, respuestas rápidas y conversaciones sincronizadas.",
   "permissions": [
     "storage",

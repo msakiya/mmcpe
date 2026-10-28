@@ -71,3 +71,7 @@ html.crmw-open #crmw-toggle { right: calc(var(--crmw-w) + 12px); }
 .crmw-msg-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; color: #667781; margin-bottom: 2px; }
 .crmw-msg-text { white-space: pre-wrap; word-break: break-word; color: #111b21; }
 .crmw-card label.crmw-af { text-transform: none; letter-spacing: 0; font-size: 12px; color: #111b21; margin: 6px 0 2px; }
+/* v1.5: Guardar como lead */
+.crmw-lead { font-size: 14px; padding: 9px 14px; margin-top: 8px; }
+.crmw-badge { display: inline-block; background: var(--crmw-gt); color: var(--crmw-gd); border: 1px solid var(--crmw-g); border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; }
+.crmw-badge.off { background: #f1f3f4; color: #667781; border-color: #d1d7db; }
