@@ -1,4 +1,4 @@
-// CRM Xigma – panel
+// CRM CPE – panel
 (() => {
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const csrf = document.querySelector('meta[name="csrf"]')?.content || '';

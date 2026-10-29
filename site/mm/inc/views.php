@@ -18,7 +18,7 @@ function icon($n) {
 }
 function head_html($title) {
   return '<!doctype html><html lang="es-PE"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    . '<meta name="robots" content="noindex,nofollow"><meta name="csrf" content="' . h(csrf()) . '"><title>' . h($title) . ' · CRM Xigma</title>'
+    . '<meta name="robots" content="noindex,nofollow"><meta name="csrf" content="' . h(csrf()) . '"><title>' . h($title) . ' · CRM CPE</title>'
     . '<link rel="icon" type="image/png" href="/mm/assets/icon.png"><link rel="apple-touch-icon" href="/mm/assets/apple-touch-icon.png"><meta name="theme-color" content="#1b282e"><link rel="stylesheet" href="/mm/assets/app.css?v=' . ASSET_V . '"><script src="/mm/assets/app.js?v=' . ASSET_V . '" defer></script></head>';
 }
 function pass_input($name, $label, $auto = 'current-password', $req = true) {
@@ -28,7 +28,7 @@ function pass_input($name, $label, $auto = 'current-password', $req = true) {
 }
 function layout($title, $active, $content) {
   $nav = [['', 'Inicio', 'home'], ['leads', 'Leads', 'users'], ['embudo', 'Embudo', 'kanban'], ['ajustes', 'Ajustes', 'gear']];
-  echo head_html($title) . '<body><div class="app"><aside class="side"><a class="brand" href="/mm/" title="CRM Xigma"><img class="brand-logo" src="/mm/assets/logo.png" alt="Xigma Group" width="160" height="44"><img class="brand-icon" src="/mm/assets/apple-touch-icon.png" alt="CRM Xigma" width="34" height="34"><span class="brand-sub">CRM</span></a><nav>';
+  echo head_html($title) . '<body><div class="app"><aside class="side"><a class="brand" href="/mm/" title="CRM CPE"><img class="brand-logo" src="/mm/assets/logo.png" alt="CRM CPE" width="160" height="44"><img class="brand-icon" src="/mm/assets/apple-touch-icon.png" alt="CRM CPE" width="34" height="34"><span class="brand-sub">CRM</span></a><nav>';
   foreach ($nav as [$k, $l, $i]) echo '<a href="/mm/' . $k . '" class="' . ($active === ($k ?: 'dashboard') ? 'on' : '') . '">' . icon($i) . '<span>' . $l . '</span></a>';
   echo '</nav><form method="post" action="/mm/logout" class="logout">' . csrf_field() . '<span class="who" title="' . h(role_name(role())) . '">' . h($_SESSION['user'] ?? '') . ' · ' . h(role_name(role())) . '</span><button class="link" title="Cerrar sesión">' . icon('out') . '<span>Salir</span></button></form></aside><main class="main">';
   if ($f = flash()) echo '<div class="flash ' . h($f[1]) . '" role="status">' . h($f[0]) . '</div>';
@@ -37,13 +37,13 @@ function layout($title, $active, $content) {
 
 // ---------- Login ----------
 function view_login($err, $user) {
-  echo head_html('Iniciar sesión') . '<body class="login-bg"><main class="login"><div class="card login-card"><div class="login-logo"><img src="/mm/assets/logo.png" alt="Xigma Group" width="240" height="66"></div><h1 class="login-title">CRM Xigma</h1>'
+  echo head_html('Iniciar sesión') . '<body class="login-bg"><main class="login"><div class="card login-card"><div class="login-logo"><img src="/mm/assets/logo.png" alt="CRM CPE" width="240" height="65"></div><h1 class="login-title">CRM CPE</h1>'
     . '<p class="muted">Ingresa con el mismo usuario de la extensión.</p>'
     . ($err ? '<div class="flash err">' . h($err) . '</div>' : '')
     . '<form method="post" action="/mm/login" class="form">' . csrf_field()
     . '<label for="user">Usuario</label><input id="user" name="user" autocomplete="username" required autofocus value="' . h($user) . '">'
     . pass_input('pass', 'Contraseña')
-    . '<button class="btn primary block">Ingresar</button></form><p class="foot">CRM Xigma · Xigma Group</p></div></main></body></html>';
+    . '<button class="btn primary block">Ingresar</button></form><p class="foot">CRM CPE · Comunidad CPE</p></div></main></body></html>';
 }
 
 // ---------- Helpers multiusuario ----------

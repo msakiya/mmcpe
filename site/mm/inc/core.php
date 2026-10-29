@@ -1,5 +1,5 @@
 <?php
-// CRM Xigma – núcleo del panel CRM (sesión, CSRF, datos compartidos con la extensión)
+// CRM CPE – núcleo del panel CRM (sesión, CSRF, datos compartidos con la extensión)
 define('CRM_LIB', getenv('CRM_LIB') ?: '/home/mmcpe/crm-data/lib.php');
 require CRM_LIB;
 ensure_roles();

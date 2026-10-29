@@ -7,8 +7,8 @@ Panel CRM y API de sincronización de **https://mm.comunidadcpe.com**, más la e
   - `index.html`, `404.html` – portada
   - `mm/` – panel web (login, dashboard, leads, embudo, ajustes). El panel vive en `/mm`, nunca en `/admin`.
   - `api/` – API JSON que usa la extensión (`auth/login`, `auth/logout`, `sync`, `conversations`, `health`)
-  - `download-extension.php` – descarga `crm-cpe-v1.5.0.zip` (el zip no se versiona; se genera desde `extension/`)
-- `extension/crm-cpe/` – extensión de Chrome **crm-cpe** (Manifest V3, v1.5.0) apuntando a `https://mm.comunidadcpe.com`
+  - `download-extension.php` – descarga `crm-cpe-v1.5.1.zip` (el zip no se versiona; se genera desde `extension/`)
+- `extension/crm-cpe/` – extensión de Chrome **crm-cpe** (Manifest V3, v1.5.1) apuntando a `https://mm.comunidadcpe.com`
 - `config/lib.example.php` – plantilla de la capa de datos (SQLite)
 
 ## Datos (fuera del docroot)
@@ -21,7 +21,7 @@ Los datos viven en `/home/mmcpe/crm-data/` (permisos 700) y **no** están en est
 
 ## Empaquetar la extensión
 ```
-cd extension && zip -r ../crm-cpe-v1.5.0.zip crm-cpe
+cd extension && zip -r ../crm-cpe-v1.5.1.zip crm-cpe
 ```
 Subir el zip al docroot junto a `download-extension.php`.
 

@@ -1,17 +1,17 @@
 # crm-cpe – Extensión de Chrome para WhatsApp Web
 
-Versión 1.5.0 · Comunidad CPE
+Versión 1.5.1 · Comunidad CPE
 
 Convierte WhatsApp Web en un CRM básico. Los datos se guardan en tu navegador (`chrome.storage.local`) y, si te conectas, se sincronizan con tu servidor **https://mm.comunidadcpe.com** para tenerlos iguales en todas tus computadoras.
 
 ## Instalación
-1. Descomprime `crm-cpe-v1.5.0.zip`: obtendrás la carpeta `crm-cpe`.
+1. Descomprime `crm-cpe-v1.5.1.zip`: obtendrás la carpeta `crm-cpe`.
 2. Abre `chrome://extensions` en Chrome.
 3. Activa **Modo de desarrollador** (arriba a la derecha).
 4. Clic en **Cargar descomprimida** y elige la carpeta `crm-cpe`.
 5. Abre (o recarga) https://web.whatsapp.com.
 
-**Si ya tenías la versión anterior (CRM Xigma / carpeta `crm-xigma-cpe`):** quita la extensión antigua en `chrome://extensions`, carga la carpeta `crm-cpe` y vuelve a conectarte en Ajustes → Sincronización: se descargarán tus leads del servidor.
+**Si ya tenías la versión anterior (1.4.x o 1.5.0, con otra carpeta):** quita la extensión antigua en `chrome://extensions`, carga la carpeta `crm-cpe` y vuelve a conectarte en Ajustes → Sincronización: se descargarán tus leads del servidor.
 
 Panel web: https://mm.comunidadcpe.com/mm (mismo usuario y contraseña).
 
